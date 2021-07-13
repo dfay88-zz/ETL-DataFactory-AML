@@ -1,0 +1,119 @@
+{
+	"name": "OnPrem_Dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OnPremFileSystem",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": "default_credit_card_data.csv"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "LIMIT_BAL",
+				"type": "String"
+			},
+			{
+				"name": "SEX",
+				"type": "String"
+			},
+			{
+				"name": "EDUCATION",
+				"type": "String"
+			},
+			{
+				"name": "MARRIAGE",
+				"type": "String"
+			},
+			{
+				"name": "AGE",
+				"type": "String"
+			},
+			{
+				"name": "PAY_0",
+				"type": "String"
+			},
+			{
+				"name": "PAY_2",
+				"type": "String"
+			},
+			{
+				"name": "PAY_3",
+				"type": "String"
+			},
+			{
+				"name": "PAY_4",
+				"type": "String"
+			},
+			{
+				"name": "PAY_5",
+				"type": "String"
+			},
+			{
+				"name": "PAY_6",
+				"type": "String"
+			},
+			{
+				"name": "BILL_AMT1",
+				"type": "String"
+			},
+			{
+				"name": "BILL_AMT2",
+				"type": "String"
+			},
+			{
+				"name": "BILL_AMT3",
+				"type": "String"
+			},
+			{
+				"name": "BILL_AMT4",
+				"type": "String"
+			},
+			{
+				"name": "BILL_AMT5",
+				"type": "String"
+			},
+			{
+				"name": "BILL_AMT6",
+				"type": "String"
+			},
+			{
+				"name": "PAY_AMT1",
+				"type": "String"
+			},
+			{
+				"name": "PAY_AMT2",
+				"type": "String"
+			},
+			{
+				"name": "PAY_AMT3",
+				"type": "String"
+			},
+			{
+				"name": "PAY_AMT4",
+				"type": "String"
+			},
+			{
+				"name": "PAY_AMT5",
+				"type": "String"
+			},
+			{
+				"name": "PAY_AMT6",
+				"type": "String"
+			},
+			{
+				"name": "default payment next month",
+				"type": "String"
+			}
+		]
+	}
+}
