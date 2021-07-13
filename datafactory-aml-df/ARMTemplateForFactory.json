@@ -1,0 +1,311 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "datafactory-aml-df"
+		},
+		"OnPremFileSystem_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'OnPremFileSystem'"
+		},
+		"AzureBlobStorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
+		},
+		"OnPremFileSystem_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "C:\\Users\\dafay\\OneDrive - Microsoft\\Documents\\Demos\\ETL-DataFactory-AML\\Data"
+		},
+		"OnPremFileSystem_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "NORTHAMERICA\\dafay"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/OnPremFileSystem')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('OnPremFileSystem_properties_typeProperties_host')]",
+					"userId": "[parameters('OnPremFileSystem_properties_typeProperties_userId')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('OnPremFileSystem_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "onpremdatagateway",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/onpremdatagateway')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/onpremdatagateway')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "onpremdatagateway",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/onpremdatagateway')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ETL-AML-Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "CopyOnPrem2Blob",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 3,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": true,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OnPrem_Dataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "Blob_Dataset",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/OnPrem_Dataset')]",
+				"[concat(variables('factoryId'), '/datasets/Blob_Dataset')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OnPrem_Dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "OnPremFileSystem",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "default_credit_card_data.csv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "LIMIT_BAL",
+						"type": "String"
+					},
+					{
+						"name": "SEX",
+						"type": "String"
+					},
+					{
+						"name": "EDUCATION",
+						"type": "String"
+					},
+					{
+						"name": "MARRIAGE",
+						"type": "String"
+					},
+					{
+						"name": "AGE",
+						"type": "String"
+					},
+					{
+						"name": "PAY_0",
+						"type": "String"
+					},
+					{
+						"name": "PAY_2",
+						"type": "String"
+					},
+					{
+						"name": "PAY_3",
+						"type": "String"
+					},
+					{
+						"name": "PAY_4",
+						"type": "String"
+					},
+					{
+						"name": "PAY_5",
+						"type": "String"
+					},
+					{
+						"name": "PAY_6",
+						"type": "String"
+					},
+					{
+						"name": "BILL_AMT1",
+						"type": "String"
+					},
+					{
+						"name": "BILL_AMT2",
+						"type": "String"
+					},
+					{
+						"name": "BILL_AMT3",
+						"type": "String"
+					},
+					{
+						"name": "BILL_AMT4",
+						"type": "String"
+					},
+					{
+						"name": "BILL_AMT5",
+						"type": "String"
+					},
+					{
+						"name": "BILL_AMT6",
+						"type": "String"
+					},
+					{
+						"name": "PAY_AMT1",
+						"type": "String"
+					},
+					{
+						"name": "PAY_AMT2",
+						"type": "String"
+					},
+					{
+						"name": "PAY_AMT3",
+						"type": "String"
+					},
+					{
+						"name": "PAY_AMT4",
+						"type": "String"
+					},
+					{
+						"name": "PAY_AMT5",
+						"type": "String"
+					},
+					{
+						"name": "PAY_AMT6",
+						"type": "String"
+					},
+					{
+						"name": "default payment next month",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/OnPremFileSystem')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Blob_Dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage')]"
+			]
+		}
+	]
+}
