@@ -1,0 +1,6 @@
+{
+	"name": "onpremdatagateway",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
