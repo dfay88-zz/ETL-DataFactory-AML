@@ -5,9 +5,9 @@
 		"annotations": [],
 		"type": "FileServer",
 		"typeProperties": {
-			"host": "C:\\Users\\dafay\\OneDrive - Microsoft\\Documents\\Demos\\ETL-DataFactory-AML\\Data",
-			"userId": "dafay@microsoft.com",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZLUFNTC1ERl9iZWM1NTZkOC05NjY4LTQ1MjUtYjQ3Yi1lNDllZDVmM2VjODMiDQp9"
+			"host": "C:\\Data",
+			"userId": "NORTHAMERICA\\dafay",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZLUFNTC1ERl9hODM3NDhhOC0yY2RiLTQ3NDItYWZmNy01M2Q1ZmEwMDNjYmYiDQp9"
 		}
 	}
 }
