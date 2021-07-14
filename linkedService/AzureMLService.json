@@ -1,0 +1,13 @@
+{
+	"name": "AzureMLService",
+	"properties": {
+		"annotations": [],
+		"type": "AzureMLService",
+		"typeProperties": {
+			"subscriptionId": "85f5719f-4af9-4434-8435-75c2a1701734",
+			"resourceGroupName": "ETL-DataFactory-AML",
+			"mlWorkspaceName": "amlworkspace",
+			"authentication": "MSI"
+		}
+	}
+}
