@@ -7,13 +7,21 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactory-aml-df"
 		},
+		"AzureBlobStorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
+		},
 		"OnPremFileSystem_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'OnPremFileSystem'"
 		},
-		"AzureBlobStorage_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
+		"AzureMLService_properties_typeProperties_subscriptionId": {
+			"type": "string",
+			"defaultValue": "85f5719f-4af9-4434-8435-75c2a1701734"
+		},
+		"AzureMLService_properties_typeProperties_resourceGroupName": {
+			"type": "string",
+			"defaultValue": "ETL-DataFactory-AML"
 		},
 		"OnPremFileSystem_properties_typeProperties_host": {
 			"type": "string",
@@ -29,6 +37,22 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/AzureMLService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureMLService",
+				"typeProperties": {
+					"subscriptionId": "[parameters('AzureMLService_properties_typeProperties_subscriptionId')]",
+					"resourceGroupName": "[parameters('AzureMLService_properties_typeProperties_resourceGroupName')]",
+					"mlWorkspaceName": "amlworkspace",
+					"authentication": "MSI"
+				}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/onpremdatagateway')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -37,6 +61,25 @@
 				"typeProperties": {}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('AzureBlobStorage_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "onpremdatagateway",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/onpremdatagateway')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/OnPremFileSystem')]",
@@ -63,22 +106,30 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/AzureBlobStorage')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"name": "[concat(parameters('factoryName'), '/Blob_Dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"annotations": [],
-				"type": "AzureBlobStorage",
-				"typeProperties": {
-					"connectionString": "[parameters('AzureBlobStorage_connectionString')]"
+				"linkedServiceName": {
+					"referenceName": "AzureBlobStorage",
+					"type": "LinkedServiceReference"
 				},
-				"connectVia": {
-					"referenceName": "onpremdatagateway",
-					"type": "IntegrationRuntimeReference"
-				}
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"container": "raw"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/onpremdatagateway')]"
+				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage')]"
 			]
 		},
 		{
@@ -206,33 +257,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Blob_Dataset')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureBlobStorage",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "DelimitedText",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobStorageLocation",
-						"container": "raw"
-					},
-					"columnDelimiter": ",",
-					"escapeChar": "\\",
-					"firstRowAsHeader": true,
-					"quoteChar": "\""
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureBlobStorage')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/ETL-AML-Pipeline')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -298,13 +322,45 @@
 								"parameters": {}
 							}
 						]
+					},
+					{
+						"name": "Machine Learning Execute Pipeline",
+						"type": "AzureMLExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "CopyOnPrem2Blob",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"experimentName": "default_credit_card_pipeline_adf",
+							"mlPipelineParameters": {
+								"suffix": "processed"
+							},
+							"mlPipelineId": "79815a09-b1f0-4625-8008-48cf9955b33d"
+						},
+						"linkedServiceName": {
+							"referenceName": "AzureMLService",
+							"type": "LinkedServiceReference"
+						}
 					}
 				],
 				"annotations": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/OnPrem_Dataset')]",
-				"[concat(variables('factoryId'), '/datasets/Blob_Dataset')]"
+				"[concat(variables('factoryId'), '/datasets/Blob_Dataset')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureMLService')]"
 			]
 		}
 	]

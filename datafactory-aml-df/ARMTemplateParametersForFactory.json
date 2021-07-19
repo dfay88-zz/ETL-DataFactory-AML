@@ -5,11 +5,17 @@
 		"factoryName": {
 			"value": "datafactory-aml-df"
 		},
+		"AzureBlobStorage_connectionString": {
+			"value": ""
+		},
 		"OnPremFileSystem_password": {
 			"value": ""
 		},
-		"AzureBlobStorage_connectionString": {
-			"value": ""
+		"AzureMLService_properties_typeProperties_subscriptionId": {
+			"value": "85f5719f-4af9-4434-8435-75c2a1701734"
+		},
+		"AzureMLService_properties_typeProperties_resourceGroupName": {
+			"value": "ETL-DataFactory-AML"
 		},
 		"OnPremFileSystem_properties_typeProperties_host": {
 			"value": "C:\\Users\\dafay\\OneDrive - Microsoft\\Documents\\Demos\\ETL-DataFactory-AML\\Data"

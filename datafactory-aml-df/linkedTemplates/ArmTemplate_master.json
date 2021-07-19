@@ -7,13 +7,21 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "datafactory-aml-df"
 		},
+		"AzureBlobStorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
+		},
 		"OnPremFileSystem_password": {
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'OnPremFileSystem'"
 		},
-		"AzureBlobStorage_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'AzureBlobStorage'"
+		"AzureMLService_properties_typeProperties_subscriptionId": {
+			"type": "string",
+			"defaultValue": "85f5719f-4af9-4434-8435-75c2a1701734"
+		},
+		"AzureMLService_properties_typeProperties_resourceGroupName": {
+			"type": "string",
+			"defaultValue": "ETL-DataFactory-AML"
 		},
 		"OnPremFileSystem_properties_typeProperties_host": {
 			"type": "string",
@@ -50,11 +58,17 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"AzureBlobStorage_connectionString": {
+						"value": "[parameters('AzureBlobStorage_connectionString')]"
+					},
 					"OnPremFileSystem_password": {
 						"value": "[parameters('OnPremFileSystem_password')]"
 					},
-					"AzureBlobStorage_connectionString": {
-						"value": "[parameters('AzureBlobStorage_connectionString')]"
+					"AzureMLService_properties_typeProperties_subscriptionId": {
+						"value": "[parameters('AzureMLService_properties_typeProperties_subscriptionId')]"
+					},
+					"AzureMLService_properties_typeProperties_resourceGroupName": {
+						"value": "[parameters('AzureMLService_properties_typeProperties_resourceGroupName')]"
 					},
 					"OnPremFileSystem_properties_typeProperties_host": {
 						"value": "[parameters('OnPremFileSystem_properties_typeProperties_host')]"
