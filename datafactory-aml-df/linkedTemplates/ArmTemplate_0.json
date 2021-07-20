@@ -343,11 +343,12 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"experimentName": "default_credit_card_pipeline_adf",
+							"experimentName": "default_credit_card_pipeline_endpoint_adf",
 							"mlPipelineParameters": {
 								"suffix": "processed"
 							},
-							"mlPipelineId": "79815a09-b1f0-4625-8008-48cf9955b33d"
+							"mlPipelineEndpointId": "0d4d0023-9560-4b02-a948-4acbb04904fd",
+							"version": "0"
 						},
 						"linkedServiceName": {
 							"referenceName": "AzureMLService",
