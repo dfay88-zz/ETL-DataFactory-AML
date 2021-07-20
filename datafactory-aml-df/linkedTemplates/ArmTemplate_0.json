@@ -347,8 +347,7 @@
 							"mlPipelineParameters": {
 								"suffix": "processed"
 							},
-							"mlPipelineEndpointId": "0d4d0023-9560-4b02-a948-4acbb04904fd",
-							"version": "1"
+							"mlPipelineEndpointId": "0d4d0023-9560-4b02-a948-4acbb04904fd"
 						},
 						"linkedServiceName": {
 							"referenceName": "AzureMLService",
